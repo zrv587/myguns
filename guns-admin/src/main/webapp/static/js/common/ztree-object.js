@@ -71,6 +71,7 @@
 		loadNodes : function() {
 			var zNodes = null;
 			var ajax = new $ax(Feng.ctxPath + this.url, function(data) {
+				console.log(data.fullname)
 				zNodes = data;
 			}, function(data) {
 				Feng.error("加载ztree信息失败!");

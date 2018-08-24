@@ -98,7 +98,8 @@ Dict.search = function () {
 
 $(function () {
     var defaultColunms = Dict.initColumn();
-    var table = new BSTable(Dict.id, "/dict/list", defaultColunms);
+    var exportOptions={}
+    var table = new BSTable(Dict.id, "/dict/list", defaultColunms,exportOptions);
     table.setPaginationType("client");
     Dict.table = table.init();
 });

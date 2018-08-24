@@ -99,7 +99,8 @@ Dept.search = function () {
 
 $(function () {
     var defaultColunms = Dept.initColumn();
-    var table = new BSTreeTable(Dept.id, "/dept/list", defaultColunms);
+    var exportOptions={}
+    var table = new BSTreeTable(Dept.id, "/dept/list", defaultColunms,exportOptions);
     table.setExpandColumn(2);
     table.setIdField("id");
     table.setCodeField("id");

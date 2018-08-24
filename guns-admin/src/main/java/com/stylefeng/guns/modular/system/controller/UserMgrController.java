@@ -23,6 +23,8 @@ import com.stylefeng.guns.modular.system.model.User;
 import com.stylefeng.guns.modular.system.service.IUserService;
 import com.stylefeng.guns.modular.system.transfer.UserDto;
 import com.stylefeng.guns.modular.system.warpper.UserWarpper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,6 +50,7 @@ import java.util.UUID;
 @RequestMapping("/mgr")
 public class UserMgrController extends BaseController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private static String PREFIX = "/system/user/";
 
     @Autowired
@@ -164,7 +167,9 @@ public class UserMgrController extends BaseController {
             List<Map<String, Object>> users = userService.selectUsers(null, name, beginTime, endTime, deptid);
             return new UserWarpper(users).warp();
         } else {
+            // 获取当前用户的部门数据范围的集合
             DataScope dataScope = new DataScope(ShiroKit.getDeptDataScope());
+            logger.info("当前dataScoped对象为：{}",dataScope.toString());
             List<Map<String, Object>> users = userService.selectUsers(dataScope, name, beginTime, endTime, deptid);
             return new UserWarpper(users).warp();
         }
@@ -271,6 +276,7 @@ public class UserMgrController extends BaseController {
         }
         assertAuth(userId);
         User user = this.userService.selectById(userId);
+        //设置盐值加密
         user.setSalt(ShiroKit.getRandomSalt(5));
         user.setPassword(ShiroKit.md5(Const.DEFAULT_PWD, user.getSalt()));
         this.userService.updateById(user);

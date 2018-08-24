@@ -108,7 +108,8 @@ Menu.search = function () {
 
 $(function () {
     var defaultColunms = Menu.initColumn();
-    var table = new BSTreeTable(Menu.id, "/menu/list", defaultColunms);
+    var exportOptions={}
+    var table = new BSTreeTable(Menu.id, "/menu/list", defaultColunms,exportOptions);
     table.setExpandColumn(2);
     table.setIdField("id");
     table.setCodeField("code");

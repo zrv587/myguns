@@ -3,19 +3,23 @@
  *
  * 约定：toolbar的id为 (bstableId + "Toolbar")
  *
- * @author fengshuonan
+ * @author
  */
 (function () {
-    var BSTable = function (bstableId, url, columns) {
+    var BSTable = function (bstableId, url, columns,exportOptions) {
+        var exports={}
+        exports.showExport=false;
         this.btInstance = null;					//jquery和BootStrapTable绑定的对象
         this.bstableId = bstableId;
         this.url = Feng.ctxPath + url;
         this.method = "post";
         this.paginationType = "server";			//默认分页方式是服务器分页,可选项"client"
         this.toolbarId = bstableId + "Toolbar";
-        this.columns = columns;
+        this.columns = columns;  //thead
         this.height = 665;						//默认表格高度665
         this.data = {};
+        this.exportOptions=!!exportOptions?exportOptions:exports;  //导出的配置
+        // this.exportData=exportData;  //是否导出
         this.queryParams = {}; // 向后台传递的自定义参数
     };
 
@@ -41,8 +45,8 @@
                     sortable: true,      		//是否启用排序
                     sortOrder: "desc",     		//排序方式
                     pageNumber: 1,      			//初始化加载第一页，默认第一页
-                    pageSize: 14,      			//每页的记录行数（*）
-                    pageList: [14, 50, 100],  	//可供选择的每页的行数（*）
+                    pageSize: 5,      			//每页的记录行数（*）
+                    pageList: [5, 10, 20],  	//可供选择的每页的行数（*）
                     queryParamsType: 'limit', 	//默认值为 'limit' ,在默认情况下 传给服务端的参数为：offset,limit,sort
                     queryParams: function (param) {
                         return $.extend(me.queryParams, param);
@@ -58,7 +62,17 @@
                     columns: this.columns,		//列数组
                     pagination: true,			//是否显示分页条
                     height: this.height,
+                    /*
+                    * 配置导出excel
+                    */
+                    showExport: this.exportOptions.showExport,  //是否显示导出按钮
+                    buttonsAlign: "right",  //按钮位置
+                    exportDataType: this.exportOptions.exportDataType, //导出表格方式（默认basic：只导出当前页的表格数据；all：导出所有数据；selected：导出选中的数据）
+                    exportTypes: this.exportOptions.exportTypes,  //导出文件类型
+                    // Icons: 'glyphicon-export', //导出按钮的样式
+                    exportOptions:this.exportOptions.exportOpetion,
                     icons: {
+                        export:'glyphicon-export',
                         refresh: 'glyphicon-repeat',
                         toggle: 'glyphicon-list-alt',
                         columns: 'glyphicon-list'

@@ -198,8 +198,10 @@ MgrUser.onClickDept = function (e, treeId, treeNode) {
 
 $(function () {
     var defaultColunms = MgrUser.initColumn();
-    var table = new BSTable("managerTable", "/mgr/list", defaultColunms);
+    var exportOpetions={};
+    var table = new BSTable("managerTable", "/mgr/list", defaultColunms,exportOpetions);
     table.setPaginationType("client");
+
     MgrUser.table = table.init();
     var ztree = new $ZTree("deptTree", "/dept/tree");
     ztree.bindOnClick(MgrUser.onClickDept);

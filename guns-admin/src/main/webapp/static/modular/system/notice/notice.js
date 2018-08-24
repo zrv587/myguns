@@ -100,7 +100,11 @@ Notice.search = function () {
 
 $(function () {
     var defaultColunms = Notice.initColumn();
-    var table = new BSTable(Notice.id, "/notice/list", defaultColunms);
+    var exportOPtions={};
+    exportOPtions.exportTypes=['excel'];
+    exportOPtions.showExport=true;
+    exportOPtions.exportDataType="all"
+    var table = new BSTable(Notice.id, "/notice/list", defaultColunms,exportOPtions);
     table.setPaginationType("client");
     Notice.table = table.init();
 });

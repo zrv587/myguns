@@ -24,6 +24,8 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -32,12 +34,14 @@ import java.util.List;
  *
  * @author dafei, Chill Zhuang
  */
+
 public class ShiroKit {
 
+    private static Logger logger = LoggerFactory.getLogger(ShiroKit.class);
     private static final String NAMES_DELIMETER = ",";
 
     /**
-     * 加盐参数
+     * 加盐参数 ，加密方式 / MD5 SHA
      */
     public final static String hashAlgorithmName = "MD5";
 
@@ -73,6 +77,7 @@ public class ShiroKit {
      * @return Subject
      */
     public static Subject getSubject() {
+        logger.info("----进入获取认证主体方法-----");
         return SecurityUtils.getSubject();
     }
 
@@ -82,7 +87,9 @@ public class ShiroKit {
      * @return ShiroUser
      */
     public static ShiroUser getUser() {
+
         if (isGuest()) {
+            logger.info("----进入获取认证主体方法-----");
             return null;
         } else {
             return (ShiroUser) getSubject().getPrincipals().getPrimaryPrincipal();
@@ -277,9 +284,12 @@ public class ShiroKit {
      * 判断当前用户是否是超级管理员
      */
     public static boolean isAdmin() {
+
         List<Integer> roleList = ShiroKit.getUser().getRoleList();
+        logger.info("当前用户{}的角色为：{}",ShiroKit.getUser().getAccount(),roleList.toString());
         for (Integer integer : roleList) {
             String singleRoleTip = ConstantFactory.me().getSingleRoleTip(integer);
+            //如果备注是administrator 则返回true
             if (singleRoleTip.equals(Const.ADMIN_NAME)) {
                 return true;
             }

@@ -90,7 +90,8 @@ OptLog.search = function () {
 
 $(function () {
     var defaultColunms = OptLog.initColumn();
-    var table = new BSTable(OptLog.id, "/log/list", defaultColunms);
+    var exportOPtions={};
+    var table = new BSTable(OptLog.id, "/log/list", defaultColunms,exportOPtions);
     table.setPaginationType("server");
     table.setQueryParams(OptLog.formParams());
     OptLog.table = table.init();

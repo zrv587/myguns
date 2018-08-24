@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * swagger配置类
  *
- * @author fengshuonan
+ * @author zhengr
  * @date 2017年6月1日19:42:59
  */
 @Configuration
@@ -39,8 +39,8 @@ public class SwaggerConfig{
                 .title("Guns Doc")
                 .description("Guns Api文档")
                 .termsOfServiceUrl("http://git.oschina.net/naan1993/guns")
-                .contact("stylefeng")
-                .version("2.0")
+                .contact("zhengr")
+                .version("1.0")
                 .build();
     }
 

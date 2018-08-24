@@ -118,7 +118,8 @@ Role.search = function () {
 
 $(function () {
     var defaultColunms = Role.initColumn();
-    var table = new BSTable(Role.id, "/role/list", defaultColunms);
+    var exportOpetions={};
+    var table = new BSTable(Role.id, "/role/list", defaultColunms,exportOpetions);
     table.setPaginationType("client");
     table.init();
     Role.table = table;

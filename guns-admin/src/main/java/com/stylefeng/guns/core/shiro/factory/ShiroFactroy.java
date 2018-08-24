@@ -88,7 +88,6 @@ public class ShiroFactroy implements IShiro {
     @Override
     public SimpleAuthenticationInfo info(ShiroUser shiroUser, User user, String realmName) {
         String credentials = user.getPassword();
-
         // 密码加盐处理
         String source = user.getSalt();
         ByteSource credentialsSalt = new Md5Hash(source);

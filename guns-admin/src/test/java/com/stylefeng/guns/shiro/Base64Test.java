@@ -1,5 +1,6 @@
 package com.stylefeng.guns.shiro;
 
+import com.stylefeng.guns.core.shiro.ShiroKit;
 import org.springframework.util.Base64Utils;
 
 import java.io.UnsupportedEncodingException;
@@ -11,8 +12,9 @@ public class Base64Test {
      * Shiro 记住密码采用的是AES加密，AES key length 需要是16位，该方法生成16位的key
      */
     public static void main(String[] args) {
-    	
-        String keyStr = "guns";
+		String oldMd5 = ShiroKit.md5("admin", "8pgby");
+		System.out.println(oldMd5);
+		String keyStr = "guns";
         
         byte[] keys;
 		try {

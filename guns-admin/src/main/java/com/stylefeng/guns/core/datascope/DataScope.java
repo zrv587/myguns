@@ -32,6 +32,14 @@ public class DataScope {
         this.deptIds = deptIds;
     }
 
+    @Override
+    public String toString() {
+        return "DataScope{" +
+                "scopeName='" + scopeName + '\'' +
+                ", deptIds=" + deptIds +
+                '}';
+    }
+
     public List<Integer> getDeptIds() {
         return deptIds;
     }
