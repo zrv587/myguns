@@ -1,9 +1,11 @@
 package com.stylefeng.guns.modular.system.model;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -82,6 +84,47 @@ public class User extends Model<User> {
      * 保留字段
      */
 	private Integer version;
+
+	@Override
+	public String toString() {
+		return "User{" +
+				"id=" + id +
+				", avatar='" + avatar + '\'' +
+				", account='" + account + '\'' +
+				", password='" + password + '\'' +
+				", salt='" + salt + '\'' +
+				", name='" + name + '\'' +
+				", birthday=" + birthday +
+				", sex=" + sex +
+				", email='" + email + '\'' +
+				", phone='" + phone + '\'' +
+				", roleid='" + roleid + '\'' +
+				", deptid=" + deptid +
+				", status=" + status +
+				", createtime=" + createtime +
+				", version=" + version +
+				", locked=" + locked +
+				'}';
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public Boolean getLocked() {
+		return locked;
+	}
+
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
+	}
+
+	/**
+	 * 账号是否被锁定
+	 */
+	@TableField(exist = false)//表示该属性不为数据库表字段，但又是必须使用的。
+	private Boolean locked = Boolean.FALSE;
+
 
 
 	public Integer getId() {
@@ -209,24 +252,4 @@ public class User extends Model<User> {
 		return this.id;
 	}
 
-	@Override
-	public String toString() {
-		return "User{" +
-			"id=" + id +
-			", avatar=" + avatar +
-			", account=" + account +
-			", password=" + password +
-			", salt=" + salt +
-			", name=" + name +
-			", birthday=" + birthday +
-			", sex=" + sex +
-			", email=" + email +
-			", phone=" + phone +
-			", roleid=" + roleid +
-			", deptid=" + deptid +
-			", status=" + status +
-			", createtime=" + createtime +
-			", version=" + version +
-			"}";
-	}
 }
