@@ -43,4 +43,11 @@ public interface IUserService extends IService<User> {
      */
     User getByAccount(@Param("account") String account);
 
+
+    /**
+     *根据账号修改状态
+     * @return
+     */
+    int updateByAccount(@Param("account")String account,@Param("status")int status);
+
 }
