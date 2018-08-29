@@ -1,6 +1,8 @@
 package com.stylefeng.guns.core.shiro.check;
 
 import com.stylefeng.guns.core.shiro.ShiroKit;
+import com.stylefeng.guns.modular.system.service.IUserService;
+import com.stylefeng.guns.modular.system.service.impl.UserServiceImpl;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
@@ -82,6 +84,8 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
             passwordRetryCache.put(username, retryCount);
         }
         if(retryCount.incrementAndGet() > 5) {
+            // 设置账号被冻结
+            UserServiceImpl.me().updateByAccount(username,2);
             logger.warn("username: " + username + " tried to login more than 5 times in period");
             throw new ExcessiveAttemptsException("username: " + username + " tried to login more than 5 times in period"
             );

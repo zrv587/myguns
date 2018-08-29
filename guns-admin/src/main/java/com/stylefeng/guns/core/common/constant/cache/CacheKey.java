@@ -27,5 +27,11 @@ public interface CacheKey {
      * 部门名称
      */
     String DEPT_NAME = "dept_name_";
+    
+    /**
+     * @Description todo
+     * 账户名称
+     */
+    String ACCOUNT_NAME = "account_name_";
 
 }

@@ -73,7 +73,7 @@ public class User extends Model<User> {
      */
 	private Integer deptid;
     /**
-     * 状态(1：启用  2：冻结  3：删除）
+     * 状态(1：启用  2：冻结  3：删除，4：密码次数上限被锁定）
      */
 	private Integer status;
     /**

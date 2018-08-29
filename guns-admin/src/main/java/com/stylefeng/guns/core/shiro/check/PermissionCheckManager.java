@@ -47,4 +47,6 @@ public class PermissionCheckManager {
     public static boolean checkAll() {
         return me.defaultCheckFactory.checkAll();
     }
+
+    public  static  void checkLogin(){};
 }

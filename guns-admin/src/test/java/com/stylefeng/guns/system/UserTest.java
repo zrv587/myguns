@@ -19,7 +19,6 @@ public class UserTest extends BaseJunit {
 
     @Test
     public void userTest() throws Exception {
-
     }
 
 }

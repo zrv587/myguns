@@ -1,5 +1,4 @@
 /**
- * Copyright (c) 2015-2017, Chill Zhuang 庄骞 (smallchill@163.com).
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +16,7 @@ package com.stylefeng.guns.core.shiro;
 
 import com.stylefeng.guns.core.common.constant.Const;
 import com.stylefeng.guns.core.common.constant.factory.ConstantFactory;
+import com.stylefeng.guns.core.shiro.filter.KickoutSessionControlFilter;
 import com.stylefeng.guns.core.util.ToolUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -26,6 +26,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
@@ -77,7 +78,6 @@ public class ShiroKit {
      * @return Subject
      */
     public static Subject getSubject() {
-        logger.info("----进入获取认证主体方法-----");
         return SecurityUtils.getSubject();
     }
 
@@ -89,6 +89,7 @@ public class ShiroKit {
     public static ShiroUser getUser() {
 
         if (isGuest()) {
+
             logger.info("----进入获取认证主体方法-----");
             return null;
         } else {
@@ -296,5 +297,7 @@ public class ShiroKit {
         }
         return false;
     }
+
+
 
 }

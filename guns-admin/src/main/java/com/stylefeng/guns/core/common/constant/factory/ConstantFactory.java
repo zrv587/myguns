@@ -26,6 +26,7 @@ import java.util.List;
  * @author fengshuonan
  * @date 2017年2月13日 下午10:55:21
  */
+
 @Component
 @DependsOn("springContextHolder") //@DependsOn 优先注入springContextHolder
 public class ConstantFactory implements IConstantFactory {

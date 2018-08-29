@@ -1,5 +1,6 @@
 package com.stylefeng.guns.core.shiro;
 
+import com.stylefeng.guns.core.shiro.check.RetryLimitCredentialsMatcher;
 import com.stylefeng.guns.core.shiro.factory.IShiro;
 import com.stylefeng.guns.core.shiro.factory.ShiroFactroy;
 import com.stylefeng.guns.core.util.ToolUtil;
@@ -12,11 +13,17 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
+import javax.security.auth.login.AccountLockedException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ShiroDbRealm extends AuthorizingRealm {
+
+    private  RetryLimitCredentialsMatcher retryLimitCredentialsMatcher;
+    public ShiroDbRealm(RetryLimitCredentialsMatcher retryLimitCredentialsMatcher) {
+        this.retryLimitCredentialsMatcher=retryLimitCredentialsMatcher;
+    }
 
     /**
      * 登录认证
@@ -26,10 +33,16 @@ public class ShiroDbRealm extends AuthorizingRealm {
             throws AuthenticationException {
         IShiro shiroFactory = ShiroFactroy.me();
         UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
-        User user = shiroFactory.user(token.getUsername());
-        ShiroUser shiroUser = shiroFactory.shiroUser(user);
-        SimpleAuthenticationInfo info = shiroFactory.info(shiroUser, user, super.getName());
-        return info;
+        User user=shiroFactory.user(token.getUsername());
+
+        if(user.getStatus()==2){
+            throw new AccountException("账号被锁定");
+        }else {
+            ShiroUser shiroUser = shiroFactory.shiroUser(user);
+            SimpleAuthenticationInfo info = shiroFactory.info(shiroUser, user, super.getName());
+            retryLimitCredentialsMatcher.doCredentialsMatch(authcToken,info);
+            return info;
+        }
     }
 
     /**

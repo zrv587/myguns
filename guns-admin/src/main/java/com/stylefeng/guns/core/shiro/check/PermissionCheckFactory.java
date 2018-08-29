@@ -18,9 +18,11 @@ package com.stylefeng.guns.core.shiro.check;
 import com.stylefeng.guns.core.listener.ConfigListener;
 import com.stylefeng.guns.core.shiro.ShiroKit;
 import com.stylefeng.guns.core.shiro.ShiroUser;
+import com.stylefeng.guns.core.shiro.filter.KickoutSessionControlFilter;
 import com.stylefeng.guns.core.support.CollectionKit;
 import com.stylefeng.guns.core.support.HttpKit;
 import com.stylefeng.guns.core.util.SpringContextHolder;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 @DependsOn("springContextHolder")
 @Transactional(readOnly = true)
 public class PermissionCheckFactory implements ICheck {
+
+    private   KickoutSessionControlFilter kickoutSessionControlFilter;
 
     public static ICheck me() {
         return SpringContextHolder.getBean(ICheck.class);
@@ -69,5 +73,6 @@ public class PermissionCheckFactory implements ICheck {
         }
         return false;
     }
+
 
 }

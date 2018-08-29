@@ -8,9 +8,15 @@ import com.stylefeng.guns.core.common.constant.factory.ITestFactory;
 import com.stylefeng.guns.core.common.constant.factory.TestFactory;
 import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
+import org.nutz.ssdb4j.SSDBs;
+import org.nutz.ssdb4j.spi.Response;
+import org.nutz.ssdb4j.spi.SSDB;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.Test;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * code is far away from bug with the animal protecting
@@ -53,5 +59,15 @@ public class SpringContextHolderTest {
     public void testAdd(){
       int num=  TestFactory.me().add(1,3);
         System.out.println(num);
+    }
+
+    @Test
+    public void testLinkList() {
+        Deque deque = new LinkedList();
+        deque.add(1);
+        deque.add(2);
+        deque.add(3);
+        deque.removeFirst();
+        System.out.println("此时的队列为："+deque);
     }
 }

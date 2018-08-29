@@ -11,15 +11,20 @@ import com.stylefeng.guns.modular.system.model.User;
 import org.apache.shiro.authc.CredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.Filter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @DependsOn("springContextHolder")
@@ -32,6 +37,7 @@ public class ShiroFactroy implements IShiro {
     @Autowired
     private MenuMapper menuMapper;
 
+
     public static IShiro me() {
         return SpringContextHolder.getBean(IShiro.class);
     }
@@ -43,7 +49,7 @@ public class ShiroFactroy implements IShiro {
 
         // 账号不存在
         if (null == user) {
-            throw new CredentialsException();
+            throw new UnknownAccountException("账号【"+account+"】不存在");
         }
         // 账号被冻结
         if (user.getStatus() != ManagerStatus.OK.getCode()) {

@@ -62,7 +62,10 @@
 		update sys_user set password = #{pwd} where id =
 		#{userId}
 	</update>
-
+	<update id="updateByAccount">
+		update sys_user set status = 3 where account =
+		#{account}
+	</update>
 	<update id="setRoles">
 		update sys_user set roleid = #{roleIds} where id =
 		#{userId}

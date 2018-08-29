@@ -13,8 +13,8 @@ import java.util.Map;
  * 管理员表 Mapper 接口
  * </p>
  *
- * @author stylefeng
- * @since 2017-07-11
+ * @author zhengr
+ * @since 2018-8-29
  */
 public interface UserMapper extends BaseMapper<User> {
 
@@ -42,4 +42,12 @@ public interface UserMapper extends BaseMapper<User> {
      * 通过账号获取用户
      */
     User getByAccount(@Param("account") String account);
+
+    /**
+     * 根据账号修改状态
+     * @param account 账号
+     * @param status  状态
+     * @return
+     */
+    int updateByAccount(@Param("account")String account,@Param("status")int status);
 }
