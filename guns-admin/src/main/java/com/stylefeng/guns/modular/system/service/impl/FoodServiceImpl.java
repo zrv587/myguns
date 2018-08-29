@@ -7,6 +7,9 @@ import com.stylefeng.guns.modular.system.dao.FoodMapper;
 import com.stylefeng.guns.modular.system.service.IFoodService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
  * @since 2018-08-15
  */
 @Service
+@Transactional(propagation= Propagation.NESTED,isolation= Isolation.DEFAULT,readOnly = false,rollbackFor=RuntimeException.class)
 public class FoodServiceImpl extends ServiceImpl<FoodMapper, Food> implements IFoodService {
 
     @Override
