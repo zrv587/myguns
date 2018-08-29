@@ -27,6 +27,14 @@ public class PageInfoBT<T> {
         return rows;
     }
 
+    @Override
+    public String toString() {
+        return "PageInfoBT{" +
+                "rows=" + rows +
+                ", total=" + total +
+                '}';
+    }
+
     public void setRows(List<T> rows) {
         this.rows = rows;
     }

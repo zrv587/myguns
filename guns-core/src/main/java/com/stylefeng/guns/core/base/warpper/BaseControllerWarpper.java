@@ -1,5 +1,8 @@
 package com.stylefeng.guns.core.base.warpper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 
@@ -13,12 +16,14 @@ public abstract class BaseControllerWarpper {
 
     public Object obj = null;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     public BaseControllerWarpper(Object obj) {
         this.obj = obj;
     }
 
     @SuppressWarnings("unchecked")
     public Object warp() {
+        //判断对象是List 还是 Map
         if (this.obj instanceof List) {
             List<Map<String, Object>> list = (List<Map<String, Object>>) this.obj;
             for (Map<String, Object> map : list) {
