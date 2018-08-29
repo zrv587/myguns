@@ -3,9 +3,15 @@ package com.stylefeng.guns.config.web;
 import com.stylefeng.guns.config.properties.GunsProperties;
 import com.stylefeng.guns.core.intercept.GunsUserFilter;
 import com.stylefeng.guns.core.shiro.ShiroDbRealm;
+import com.stylefeng.guns.core.shiro.ShiroKit;
+import com.stylefeng.guns.core.shiro.check.RetryLimitCredentialsMatcher;
+import com.stylefeng.guns.core.shiro.filter.KickoutSessionControlFilter;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -17,6 +23,8 @@ import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
@@ -36,7 +44,7 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfig {
-
+    private Logger logger =LoggerFactory.getLogger(this.getClass());
     /**
      * 安全管理器
      */
@@ -44,7 +52,7 @@ public class ShiroConfig {
     public DefaultWebSecurityManager securityManager(CookieRememberMeManager rememberMeManager, CacheManager cacheShiroManager, SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(this.shiroDbRealm());
-        securityManager.setCacheManager(cacheShiroManager);
+        securityManager.setCacheManager(this.getCacheShiroManager());
         securityManager.setRememberMeManager(rememberMeManager);
         securityManager.setSessionManager(sessionManager);
         return securityManager;
@@ -63,12 +71,12 @@ public class ShiroConfig {
      * session管理器(单机环境)
      */
     @Bean
-    @ConditionalOnProperty(prefix = "guns", name = "spring-session-open", havingValue = "false")
-    public DefaultWebSessionManager defaultWebSessionManager(CacheManager cacheShiroManager, GunsProperties gunsProperties) {
+//    @ConditionalOnProperty(prefix = "guns", name = "spring-session-open", havingValue = "false")
+    public DefaultWebSessionManager defaultWebSessionManager(CacheManager cacheShiroManager) {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         sessionManager.setCacheManager(cacheShiroManager);
-        sessionManager.setSessionValidationInterval(gunsProperties.getSessionValidationInterval() * 1000);
-        sessionManager.setGlobalSessionTimeout(gunsProperties.getSessionInvalidateTime() * 1000);
+        sessionManager.setSessionValidationInterval( 3600000);
+        sessionManager.setGlobalSessionTimeout( 3600000);
         sessionManager.setDeleteInvalidSessions(true);
         sessionManager.setSessionValidationSchedulerEnabled(true);
         Cookie cookie = new SimpleCookie(ShiroHttpSession.DEFAULT_SESSION_ID_NAME);
@@ -82,10 +90,11 @@ public class ShiroConfig {
      * 缓存管理器 使用Ehcache实现
      */
     @Bean
-    public CacheManager getCacheShiroManager(EhCacheManagerFactoryBean ehcache) {
-        EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager(ehcache.getObject());
-        return ehCacheManager;
+    public CacheManager getCacheShiroManager() {
+        logger.info("ShiroConfiguration.getEhCacheManager()");
+        EhCacheManager cacheManager = new EhCacheManager();
+        cacheManager.setCacheManagerConfigFile("classpath:ehcache.xml");
+        return cacheManager;
     }
 
     /**
@@ -93,7 +102,7 @@ public class ShiroConfig {
      */
     @Bean
     public ShiroDbRealm shiroDbRealm() {
-        return new ShiroDbRealm();
+        return new ShiroDbRealm( this.retryLimitCredentialsMatcher());
     }
 
     /**
@@ -143,7 +152,9 @@ public class ShiroConfig {
          */
         HashMap<String, Filter> myFilters = new HashMap<>();
         myFilters.put("user", new GunsUserFilter());
+        myFilters.put("kickout",kickoutSessionControlFilter());
         shiroFilter.setFilters(myFilters);
+
 
         /**
          * 配置shiro拦截器链
@@ -160,9 +171,12 @@ public class ShiroConfig {
         Map<String, String> hashMap = new LinkedHashMap<>();
         hashMap.put("/static/**", "anon");
         hashMap.put("/login", "anon");
+        hashMap.put("/kickout", "anon");
+        hashMap.put("/kickoutCheck", "kickout");
         hashMap.put("/global/sessionError", "anon");
         hashMap.put("/kaptcha", "anon");
         hashMap.put("/**", "user");
+        hashMap.put("/logout","logout");
         shiroFilter.setFilterChainDefinitionMap(hashMap);
         return shiroFilter;
     }
@@ -197,6 +211,38 @@ public class ShiroConfig {
                 new AuthorizationAttributeSourceAdvisor();
         authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
         return authorizationAttributeSourceAdvisor;
+    }
+    /**
+     * 限制同一账号登录同时登录人数控制
+     * @return
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "guns", name = "spring-session-open", havingValue = "false")
+    public KickoutSessionControlFilter kickoutSessionControlFilter(){
+        logger.info("------注入踢人过滤器-----");
+        KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
+//使用cacheManager获取相应的cache来缓存用户登录的会话；用于保存用户—会话之间的关系的；
+//这里我们还是用之前shiro使用的redisManager()实现的cacheManager()缓存管理
+//也可以重新另写一个，重新配置缓存时间之类的自定义缓存属性
+        kickoutSessionControlFilter.setCacheManager(this.getCacheShiroManager());
+//用于根据会话ID，获取会话进行踢出操作的；
+        kickoutSessionControlFilter.setSessionManager(this.defaultWebSessionManager( this.getCacheShiroManager()));
+//是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；踢出顺序。
+        kickoutSessionControlFilter.setKickoutAfter(true);
+//同一个用户最大的会话数，默认1；比如2的意思是同一个用户允许最多同时两个人登录；
+        kickoutSessionControlFilter.setMaxSession(1);
+//被踢出后重定向到的地址；
+        kickoutSessionControlFilter.setKickoutUrl("/kickout");
+        return kickoutSessionControlFilter;
+    }
+
+    /**
+     *     密码错误次数
+     */
+    @Bean
+    public RetryLimitCredentialsMatcher retryLimitCredentialsMatcher(){
+        logger.info("注入密码错误次数.....");
+        return  new RetryLimitCredentialsMatcher(this.getCacheShiroManager(),ShiroKit.hashAlgorithmName,ShiroKit.hashIterations);
     }
 
 }
