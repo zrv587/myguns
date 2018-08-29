@@ -80,6 +80,15 @@ public class LoginController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/kickoutCheck", method = RequestMethod.GET)
+    public String kickoutCheck() {
+        if (ShiroKit.isAuthenticated() || ShiroKit.getUser() != null) {
+            return REDIRECT + "/";
+        } else {
+            return "/login.html";
+        }
+    }
+
     /**
      * 点击登录执行的动作
      */
@@ -118,16 +127,22 @@ public class LoginController extends BaseController {
 
         ShiroKit.getSession().setAttribute("sessionFlag", true);
 
-        return REDIRECT + "/";
+        return REDIRECT + "/kickoutCheck";
     }
 
     /**
-     * 退出登录
+     * 踢出系统
+     */
+    @RequestMapping(value = "/kickout", method = RequestMethod.GET)
+    public String kickOut() {
+        return "/kickout.html";
+    }
+
+    /**
+     * 退出系统
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public String logOut() {
-        LogManager.me().executeLog(LogTaskFactory.exitLog(ShiroKit.getUser().getId(), getIp()));
-        ShiroKit.getSubject().logout();
-        return REDIRECT + "/login";
+    public String logout() {
+        return "/login.html";
     }
 }
